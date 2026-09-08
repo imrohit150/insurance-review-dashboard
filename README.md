@@ -1,4 +1,4 @@
-# Enrollment Review Workbench
+# Insurance Review Dashboard
 
 A polished, production-style operations dashboard for reviewing insurance enrollment submissions. This project focuses on helping an operations team quickly triage high-priority cases, inspect applicant details, and make approval or correction decisions with clear status feedback.
 
