@@ -86,7 +86,49 @@ src/
 
 ## Deployment
 
-This project is structured so it can be deployed to a hosting platform such as Vercel, Netlify, or a similar frontend host. For deployment, the app can be built with the production command and served from the generated static output.
+The frontend and mock API should be deployed as two services:
+
+### 1. Deploy the API to Render
+
+Create a new **Web Service** in Render and connect the GitHub repository:
+
+- Build command: `npm install`
+- Start command: `node mock-api.js`
+- Runtime: Node
+- Environment variable: Render supplies `PORT` automatically
+
+After deployment, copy the service URL, for example:
+
+```text
+https://insurance-review-api.onrender.com
+```
+
+The API base URL is:
+
+```text
+https://insurance-review-api.onrender.com/api
+```
+
+### 2. Deploy the frontend to Vercel
+
+Import the same GitHub repository into Vercel with these settings:
+
+- Framework preset: `Vite`
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm install`
+
+In the Vercel project settings, add this environment variable:
+
+```text
+VITE_API_URL=https://insurance-review-api.onrender.com/api
+```
+
+Redeploy after adding the variable. The public Vercel URL will then load submissions and send decisions through the hosted API.
+
+### Important mock API limitation
+
+The current `mock-api.js` loads data from `mock-data.json` into memory. Decisions are not persistent and will reset whenever the Render service restarts or redeploys. For permanent live data, replace this mock API with a database-backed API before using it in production.
 
 ## Notes
 

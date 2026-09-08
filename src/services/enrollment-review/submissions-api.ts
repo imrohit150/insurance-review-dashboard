@@ -8,7 +8,7 @@ import type {
 } from './submissions-types'
 
 export const submissionsApi = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL ?? '/api',
   headers: {
     'Content-Type': 'application/json',
   },
