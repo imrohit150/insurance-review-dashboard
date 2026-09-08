@@ -100,13 +100,13 @@ Create a new **Web Service** in Render and connect the GitHub repository:
 After deployment, copy the service URL, for example:
 
 ```text
-https://insurance-review-api.onrender.com
+https://insurance-review-dashboard.onrender.com
 ```
 
 The API base URL is:
 
 ```text
-https://insurance-review-api.onrender.com/api
+https://insurance-review-dashboard.onrender.com/api
 ```
 
 ### 2. Deploy the frontend to Vercel
@@ -121,14 +121,26 @@ Import the same GitHub repository into Vercel with these settings:
 In the Vercel project settings, add this environment variable:
 
 ```text
-VITE_API_URL=https://insurance-review-api.onrender.com/api
+VITE_API_URL=https://insurance-review-dashboard.onrender.com/api
 ```
 
-Redeploy after adding the variable. The public Vercel URL will then load submissions and send decisions through the hosted API.
+Set this variable as **Config**, not **Secret**, because Vite exposes `VITE_` variables to the browser. Enable it for Production and Preview, then redeploy after saving the variable. The public Vercel URL will then load submissions and send decisions through the hosted API.
+
+### Reset the demo data
+
+The API starts with the records in `mock-data.json`. To restore all records after approving or returning submissions, send a `POST` request to the reset endpoint:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://insurance-review-dashboard.onrender.com/api/reset" `
+  -Method Post
+```
+
+Refresh the Vercel application after the command completes. For local development, use `http://localhost:4000/api/reset` instead.
 
 ### Important mock API limitation
 
-The current `mock-api.js` loads data from `mock-data.json` into memory. Decisions are not persistent and will reset whenever the Render service restarts or redeploys. For permanent live data, replace this mock API with a database-backed API before using it in production.
+The current `mock-api.js` loads data from `mock-data.json` into memory. Decisions are not persistent and will reset whenever the Render service restarts or redeploys. The public `/api/reset` endpoint is intended only for this demo; anyone who knows the endpoint can reset the data. For permanent live data, replace this mock API with a protected, database-backed API before using it in production.
 
 ## Notes
 
