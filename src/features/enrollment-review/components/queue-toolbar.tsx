@@ -2,6 +2,13 @@ import type {
   SubmissionListSort,
   SubmissionQuery,
 } from '../../../services/enrollment-review/submissions-types'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/ui/select'
 import { formatLabel } from '../lib/formatters'
 
 type FilterOption = {
@@ -22,9 +29,33 @@ export function QueueToolbar({
   reasons,
   onQueryChange,
 }: QueueToolbarProps) {
+  const sortOptions = [
+    { value: 'priority_desc', label: 'Priority: highest first' },
+    { value: 'submitted_desc', label: 'Submitted: newest first' },
+    { value: 'submitted_asc', label: 'Submitted: oldest first' },
+    { value: 'applicant_asc', label: 'Applicant: A-Z' },
+  ] as const
+
   const update = (key: keyof SubmissionQuery, value: string) => {
     onQueryChange({ ...query, [key]: value })
   }
+
+  const handleSelectValue = (key: 'group' | 'reason' | 'sort', value: string | null) => {
+    update(key, value ?? '')
+  }
+
+  const selectedGroupLabel = query.group
+    ? groups.find((group) => group.value === query.group)?.label ?? query.group
+    : 'All groups'
+
+  const selectedReasonLabel = query.reason
+    ? reasons.find((reason) => reason.value === query.reason)?.label
+      ? formatLabel(reasons.find((reason) => reason.value === query.reason)!.label)
+      : query.reason
+    : 'All reasons'
+
+  const selectedSortLabel =
+    sortOptions.find((option) => option.value === query.sort)?.label ?? 'Priority: highest first'
 
   return (
     <div className="grid grid-cols-2 gap-2 border border-[#d8ded6] bg-white/65 p-3 sm:gap-3 sm:p-4 lg:grid-cols-[1.5fr_repeat(3,minmax(150px,1fr))]" role="search" aria-label="Filter submissions">
@@ -41,50 +72,61 @@ export function QueueToolbar({
 
       <label className="grid gap-1 text-[9px] font-bold uppercase tracking-[.9px] text-[#617064] sm:gap-1.5 sm:text-[11px] sm:tracking-[1px]">
         <span>Employer group</span>
-        <select
-          value={query.group}
-          onChange={(event) => update('group', event.target.value)}
-          className="min-h-9 w-full rounded-sm border border-[#cbd5cc] bg-white px-2.5 text-xs font-normal normal-case text-[#18231e] outline-none focus-visible:outline-3 focus-visible:outline-[#b5d6b9] focus-visible:outline-offset-2 sm:min-h-[42px] sm:px-3 sm:text-sm"
+        <Select
+          value={query.group || undefined}
+          onValueChange={(value) => handleSelectValue('group', value)}
         >
-          <option value="">All groups</option>
-          {groups.map((group) => (
-            <option key={group.value} value={group.value}>
-              {group.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-full">
+            <span className="truncate">{selectedGroupLabel}</span>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All groups</SelectItem>
+            {groups.map((group) => (
+              <SelectItem key={group.value} value={group.value}>
+                {group.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </label>
 
       <label className="grid gap-1 text-[9px] font-bold uppercase tracking-[.9px] text-[#617064] sm:gap-1.5 sm:text-[11px] sm:tracking-[1px]">
         <span>Review reason</span>
-        <select
-          value={query.reason}
-          onChange={(event) => update('reason', event.target.value)}
-          className="min-h-9 w-full rounded-sm border border-[#cbd5cc] bg-white px-2.5 text-xs font-normal normal-case text-[#18231e] outline-none focus-visible:outline-3 focus-visible:outline-[#b5d6b9] focus-visible:outline-offset-2 sm:min-h-[42px] sm:px-3 sm:text-sm"
+        <Select
+          value={query.reason || undefined}
+          onValueChange={(value) => handleSelectValue('reason', value)}
         >
-          <option value="">All reasons</option>
-          {reasons.map((reason) => (
-            <option key={reason.value} value={reason.value}>
-              {formatLabel(reason.label)}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-full">
+            <span className="truncate">{selectedReasonLabel}</span>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All reasons</SelectItem>
+            {reasons.map((reason) => (
+              <SelectItem key={reason.value} value={reason.value}>
+                {formatLabel(reason.label)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </label>
 
       <label className="grid gap-1 text-[9px] font-bold uppercase tracking-[.9px] text-[#617064] sm:gap-1.5 sm:text-[11px] sm:tracking-[1px]">
         <span>Sort by</span>
-        <select
+        <Select
           value={query.sort}
-          onChange={(event) =>
-            update('sort', event.target.value as SubmissionListSort)
-          }
-          className="min-h-9 w-full rounded-sm border border-[#cbd5cc] bg-white px-2.5 text-xs font-normal normal-case text-[#18231e] outline-none focus-visible:outline-3 focus-visible:outline-[#b5d6b9] focus-visible:outline-offset-2 sm:min-h-[42px] sm:px-3 sm:text-sm"
+          onValueChange={(value) => handleSelectValue('sort', value ?? 'priority_desc')}
         >
-          <option value="priority_desc">Priority: highest first</option>
-          <option value="submitted_desc">Submitted: newest first</option>
-          <option value="submitted_asc">Submitted: oldest first</option>
-          <option value="applicant_asc">Applicant: A-Z</option>
-        </select>
+          <SelectTrigger className="w-full">
+            <span className="truncate">{selectedSortLabel}</span>
+          </SelectTrigger>
+          <SelectContent>
+            {sortOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </label>
     </div>
   )
