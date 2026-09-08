@@ -28,16 +28,24 @@ function DrawerPortal({ ...props }: DrawerPrimitive.Portal.Props) { return <Draw
 function DrawerClose({ ...props }: DrawerPrimitive.Close.Props) { return <DrawerPrimitive.Close data-slot="drawer-close" {...props} /> }
 
 function DrawerOverlay({ className, ...props }: DrawerPrimitive.Backdrop.Props) {
-  return <DrawerPrimitive.Backdrop data-slot="drawer-overlay" className={cn('fixed inset-0 z-50 min-h-dvh bg-black/20 opacity-[max(var(--drawer-overlay-min-opacity,0),calc(1-var(--drawer-swipe-progress)))] transition-opacity duration-300 data-ending-style:pointer-events-none data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs', className)} {...props} />
+  return <DrawerPrimitive.Backdrop data-slot="drawer-overlay" className={cn('fixed inset-0 z-50 min-h-dvh bg-black/20 opacity-100 animate-[drawer-fade-in_300ms_ease-out] supports-backdrop-filter:backdrop-blur-xs', className)} {...props} />
 }
 
 function DrawerContent({ className, children, ...props }: DrawerPrimitive.Popup.Props) {
   const { hasSnapPoints, modal, showSwipeHandle, swipeDirection } = useDrawer()
   const swipeAxis = swipeDirection === 'down' || swipeDirection === 'up' ? 'y' : 'x'
+
+  const drawerAnimationClass =
+    swipeDirection === 'right'
+      ? 'animate-[drawer-slide-in-right_300ms_ease-out]'
+      : swipeDirection === 'left'
+        ? 'animate-[drawer-slide-in-left_300ms_ease-out]'
+        : 'animate-[drawer-slide-in-bottom_300ms_ease-out]'
+
   return <DrawerPortal data-slot="drawer-portal">
     {modal === true && <DrawerOverlay data-snap-points={hasSnapPoints ? '' : undefined} />}
     <DrawerPrimitive.Viewport data-slot="drawer-viewport" data-modal={modal} className="pointer-events-none fixed inset-0 z-50 select-none data-[modal=true]:pointer-events-auto">
-      <DrawerPrimitive.Popup data-slot="drawer-popup" data-swipe-axis={swipeAxis} className={cn('pointer-events-auto fixed z-50 flex min-h-0 flex-col bg-[#fffdf8] text-sm text-[#18231e] shadow-xl outline-none transition-transform duration-300 data-[swipe-axis=x]:inset-y-0 data-[swipe-axis=x]:w-[min(100%,560px)] data-[swipe-axis=x]:flex-row data-[swipe-direction=right]:right-0 data-[swipe-direction=right]:rounded-l-xl data-[swipe-direction=right]:border-l data-[swipe-direction=right]:border-[#d8ded6] data-[swipe-direction=left]:left-0 data-[swipe-direction=left]:rounded-r-xl data-[swipe-direction=left]:border-r data-[swipe-direction=left]:border-[#d8ded6] data-[swipe-axis=y]:inset-x-0 data-[swipe-direction=down]:bottom-0 data-[swipe-direction=down]:max-h-[calc(100dvh-3rem)] data-[swipe-direction=down]:rounded-t-xl data-[swipe-direction=down]:border-t data-[swipe-direction=down]:border-[#d8ded6]', className)} {...props}>
+      <DrawerPrimitive.Popup data-slot="drawer-popup" data-swipe-axis={swipeAxis} className={cn('pointer-events-auto fixed z-50 flex min-h-0 flex-col bg-[#fffdf8] text-sm text-[#18231e] shadow-xl outline-none data-[swipe-axis=x]:inset-y-0 data-[swipe-axis=x]:w-[min(100%,560px)] data-[swipe-axis=x]:flex-row data-[swipe-direction=right]:right-0 data-[swipe-direction=right]:rounded-l-xl data-[swipe-direction=right]:border-l data-[swipe-direction=right]:border-[#d8ded6] data-[swipe-direction=left]:left-0 data-[swipe-direction=left]:rounded-r-xl data-[swipe-direction=left]:border-r data-[swipe-direction=left]:border-[#d8ded6] data-[swipe-axis=y]:inset-x-0 data-[swipe-direction=down]:bottom-0 data-[swipe-direction=down]:max-h-[calc(100dvh-3rem)] data-[swipe-direction=down]:rounded-t-xl data-[swipe-direction=down]:border-t data-[swipe-direction=down]:border-[#d8ded6]', drawerAnimationClass, className)} {...props}>
         {showSwipeHandle && <div className="h-1 w-16 self-center rounded-full bg-[#cbd8cc]" aria-hidden="true" />}
         <DrawerPrimitive.Content data-slot="drawer-content" className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]">{children}</DrawerPrimitive.Content>
       </DrawerPrimitive.Popup>
